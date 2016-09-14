@@ -9,15 +9,46 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+## Load R libraries and read the data
+```{r load}
+library(caret)
+training <- read.csv("D:/Documents/Cursussen/Coursera/Practical Machine Learning/Week4/pml-training.csv", na=c("#DIV/0!","","NA"))
+testing <- read.csv("D:/Documents/Cursussen/Coursera/Practical Machine Learning/Week4/pml-testing.csv")
+set.seed(34654)
 ```
+Note that I translate the value `#DIV/0!` into N/A. This value occurs in one of the columns and might otherwise cause problems.
+
+## Preprocess the data
+Note: for the sake of brevity, I will not print out an entire summary of the training table. But I did of course print the entire summary when I first analysed the data.
+
+The first seven columns don't seem to contain measurements.
+```{r summary}
+summary(training[,1:7])
+```
+The first column seems to contain a row numbering. We can check this with the following statement which counts the number of rows with X equal to the row number and compares this to the total number of rows.
+```{r checkX}
+sum(training$X==as.numeric(row.names(training))) == nrow(training)
+```
+This confirms our assumption.  
+The tested person's name is not a suitable predictor, this would make the model too specific (only applicable for the tested persons).  
+The date stamp might be useful if we wanted to use the progress of each tested person as a predictor. However discarding this information would make the model more generic, so for the time being we will discard all columns containing date and time window information.
+```{r dropColumns}
+training <- training[,-c(1:7)]
+```
+
+Next, it appears that a large number of columns contain N/A values. We will plot a histogram in order to find out how these values are distributed over the columns.
+```{r histogram}
+nas <- sapply(training, function(x) sum(is.na(x)))/nrow(training)
+histogram(as.numeric(nas), nint=10)
+```
+  
+More than 60% of the columns have more than 90% N/A values, the other columns have less than 20% N/A values. We will remove the columns with a largenumber of N/A values.
+```{r removeNA}
+training <- training[,nas<.5]
+```
+
+
+
 
 ## Including Plots
 
