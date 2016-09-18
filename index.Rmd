@@ -157,6 +157,7 @@ accGBMall <- sum(diag(confusionGBMall))/sum(confusionGBMall)
  | Tree | Random Forest | Stochastic Gradient Boosting | SGB (entire training.train dataset)
 ---------|------|---------------|----------------------|------
 Accuracy | `r accTree` | `r accForest` | `r accGBM`  | `r accGBMall`
+Out of sample error | `r 1-accTree` | `r 1-accForest` | `r 1-accGBM`  | `r 1-accGBMall`
 Calculation time | `r durationTree[3]` | `r durationForest[3]` | `r durationGBM[3]` | `r durationGBMall[3]`
 
 The Random Forest model performs best, but training takes a relatively long time. The SGB using the entire `training.train` dataset performs almost as well as the Random Forest model but takes about the same time for training. Using only half of the training dataset does not affect the performance of the boosting model, while it reduces its training time by almost 75%. 
